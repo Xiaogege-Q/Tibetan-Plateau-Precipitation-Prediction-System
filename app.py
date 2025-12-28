@@ -85,7 +85,7 @@ if df is None:
 
 # 4. 侧边栏
 st.sidebar.header("⚙️ 控制面板")
-dates = sorted(df['日期'].unique())
+dates = sorted(df['日期'].dt.date.unique())
 selected_date = st.sidebar.select_slider("📅 选择预报日期", options=dates, value=dates[-1])
 date_str = pd.to_datetime(selected_date).strftime('%Y-%m-%d')
 
@@ -120,7 +120,7 @@ else:
     st.markdown("---")
     st.subheader("🌧️ 未来三天累计降水空间分布")
 
-    def plot_final_map(data, col, title, is_bias=False):
+def plot_final_map(data, col, title, is_bias=False):
         fig, ax = plt.subplots(figsize=(10, 9))
         grid_x, grid_y = np.mgrid[67:105:300j, 25:40:300j]
         grid_z = griddata((data['经度'], data['纬度']), data[col], (grid_x, grid_y), method='linear')
@@ -145,12 +145,13 @@ else:
         cf = ax.contourf(grid_x, grid_y, grid_z, levels=levels, cmap=cmap, vmin=vmin, vmax=vmax, extend='both')
         if shp is not None: shp.boundary.plot(ax=ax, edgecolor='black', linewidth=1.2)
         
-        cbar = plt.colorbar(cf, ax=ax, orientation='horizontal', fraction=0.05, pad=0.12, aspect=30)
+        cbar = plt.colorbar(cf, ax=ax, orientation='horizontal', fraction=0.05, pad=0.08, aspect=30)
         cbar.set_label(c_label, fontsize=12)
         
         ax.set_title(title, fontsize=16, fontweight='bold', pad=12)
-        ax.set_xlabel('Lon', fontsize=12)
-        ax.set_ylabel('Lat', fontsize=12)
+        ax.set_xlabel('lon', fontsize=12)
+        ax.set_ylabel('lat', fontsize=12)
+        
         ax.set_xlim(67, 105); ax.set_ylim(25, 40)
         ax.xaxis.set_major_formatter(FuncFormatter(format_lon))
         ax.yaxis.set_major_formatter(FuncFormatter(format_lat))
@@ -171,4 +172,5 @@ else:
     c_left, c_mid, c_right = st.columns([1, 2, 1])
     with c_mid:
         st.pyplot(plot_final_map(day_data, 'Bias', f'{date_str} 偏差 (预测-实测)', is_bias=True))
+
 
