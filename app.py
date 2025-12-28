@@ -10,7 +10,7 @@ import matplotlib.font_manager as fm
 import geopandas as gpd
 import os
 
-#加载本地字体文件
+# 加载本地字体文件
 font_path = 'simhei.ttf'  
 if os.path.exists(font_path):
     fm.fontManager.addfont(font_path)
@@ -20,7 +20,7 @@ else:
 
 plt.rcParams['axes.unicode_minus'] = False
 
-st.set_page_config(layout="wide", page_title="青藏高原降水预测系统")
+st.set_page_config(layout="wide", page_title="青藏高原降水预测 system")
 
 
 def get_precip_cmap():
@@ -85,9 +85,10 @@ if df is None:
 
 # 4. 侧边栏
 st.sidebar.header("⚙️ 控制面板")
+# 提取日期部分以移除时分秒
 dates = sorted(df['日期'].dt.date.unique())
 selected_date = st.sidebar.select_slider("📅 选择预报日期", options=dates, value=dates[-1])
-date_str = pd.to_datetime(selected_date).strftime('%Y-%m-%d')
+date_str = selected_date.strftime('%Y-%m-%d')
 
 st.sidebar.info(f"""
 **当前展示数据：**
@@ -95,7 +96,8 @@ st.sidebar.info(f"""
 未来三天**累计**降水量
 """)
 
-day_data = df[df['日期'] == selected_date]
+# 过滤数据时同样只匹配日期部分
+day_data = df[df['日期'].dt.date == selected_date]
 
 if day_data.empty:
     st.warning("该日期无数据")
@@ -120,7 +122,7 @@ else:
     st.markdown("---")
     st.subheader("🌧️ 未来三天累计降水空间分布")
 
-def plot_final_map(data, col, title, is_bias=False):
+    def plot_final_map(data, col, title, is_bias=False):
         fig, ax = plt.subplots(figsize=(10, 9))
         grid_x, grid_y = np.mgrid[67:105:300j, 25:40:300j]
         grid_z = griddata((data['经度'], data['纬度']), data[col], (grid_x, grid_y), method='linear')
@@ -149,6 +151,7 @@ def plot_final_map(data, col, title, is_bias=False):
         cbar.set_label(c_label, fontsize=12)
         
         ax.set_title(title, fontsize=16, fontweight='bold', pad=12)
+        # 修改为小写
         ax.set_xlabel('lon', fontsize=12)
         ax.set_ylabel('lat', fontsize=12)
         
@@ -172,5 +175,3 @@ def plot_final_map(data, col, title, is_bias=False):
     c_left, c_mid, c_right = st.columns([1, 2, 1])
     with c_mid:
         st.pyplot(plot_final_map(day_data, 'Bias', f'{date_str} 偏差 (预测-实测)', is_bias=True))
-
-
