@@ -12,7 +12,17 @@ import os
 # ==========================================
 #  0. 全局设置：字体与配置
 # ==========================================
-plt.rcParams['font.family'] = ['Microsoft YaHei']
+# 尝试加载本地字体文件 (专门解决 Streamlit Cloud 中文乱码)
+font_path = 'simhei.ttf'  # 确保这个文件名和你上传的一模一样
+
+if os.path.exists(font_path):
+    # 如果找到了字体文件，就注册它
+    fm.fontManager.addfont(font_path)
+    plt.rcParams['font.family'] = ['SimHei'] # 设置为该字体名
+else:
+    # 本地没有文件时的备选 (Windows本地运行时依然可用)
+    plt.rcParams['font.family'] = ['Microsoft YaHei', 'SimHei', 'Arial Unicode MS']
+    
 plt.rcParams['axes.unicode_minus'] = False
 
 st.set_page_config(layout="wide", page_title="青藏高原降水预测系统")
@@ -204,4 +214,5 @@ else:
     c_left, c_mid, c_right = st.columns([1, 2, 1])
     with c_mid:
         st.write("注：蓝色表示预测偏多(湿)，红色表示预测偏少(干)")
+
         st.pyplot(plot_final_map(day_data, 'Bias', f'{date_str} 预测偏差', is_bias=True))
