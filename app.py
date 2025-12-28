@@ -8,6 +8,7 @@ import matplotlib.colors as mcolors
 import matplotlib.path as mpath
 import geopandas as gpd
 import os
+import matplotlib.font_manager as fm
 
 # ==========================================
 #  0. 全局设置：字体与配置
@@ -216,3 +217,4 @@ else:
         st.write("注：蓝色表示预测偏多(湿)，红色表示预测偏少(干)")
 
         st.pyplot(plot_final_map(day_data, 'Bias', f'{date_str} 预测偏差', is_bias=True))
+
