@@ -20,7 +20,7 @@ else:
 
 plt.rcParams['axes.unicode_minus'] = False
 
-st.set_page_config(layout="wide", page_title="青藏高原降水预测 system")
+st.set_page_config(layout="wide", page_title="青藏高原降水预测系统")
 
 
 def get_precip_cmap():
@@ -57,8 +57,8 @@ st.markdown("**说明：** 利用过去7天数据，预测**未来3天的累计�
 
 @st.cache_data
 def load_data():
-    if os.path.exists('website_data.csv'):
-        return pd.read_csv('website_data.csv', parse_dates=['日期'])
+    if os.path.exists('1.csv'):
+        return pd.read_csv('1.csv', parse_dates=['日期'])
     return None
 
 @st.cache_data
@@ -80,7 +80,7 @@ df = load_data()
 shp = load_shapefile()
 
 if df is None:
-    st.error("错误：未找到 `website_data.csv`。")
+    st.error("错误：未找到 `1.csv`。")
     st.stop()
 
 # 4. 侧边栏
@@ -175,4 +175,5 @@ else:
     c_left, c_mid, c_right = st.columns([1, 2, 1])
     with c_mid:
         st.pyplot(plot_final_map(day_data, 'Bias', f'{date_str} 偏差 (预测-实测)', is_bias=True))
+
 
